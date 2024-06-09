@@ -1,9 +1,10 @@
 import sys
-from lex import *
+from lex import TokenType, Lexer
+from emit import Emitter
 
 # Parser object keeps track of current token and checks if the code matches the grammar
 class Parser:
-  def __init__(self, lexer, emitter):
+  def __init__(self, lexer: Lexer, emitter: Emitter):
     self.lexer = lexer
     self.emitter = emitter
 
@@ -17,15 +18,15 @@ class Parser:
     self.nextToken() #  Call this twice to initialize current and peek
 
   # Return true if the current token matches
-  def checkToken(self, kind):
+  def checkToken(self, kind: TokenType):
     return kind == self.curToken.kind
 
   # Return true if the current token matches
-  def checkPeek(self, kind):
+  def checkPeek(self, kind: TokenType):
     return kind == self.peekToken.kind
 
   # Try to match current token. If not, error. Advances the current token.
-  def match(self, kind):
+  def match(self, kind: TokenType):
     if not self.checkToken(kind):
       self.abort("Expected: " + kind.name + ", got " + self.curToken.kind.name)
     self.nextToken()

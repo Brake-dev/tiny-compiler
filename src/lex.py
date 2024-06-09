@@ -2,7 +2,7 @@ import enum
 import sys
 
 class Lexer:
-  def __init__(self,source):
+  def __init__(self, source: str):
     self.source = source + '\n' # Source code to lex as a string. Append a newline to simplify lexing/parsing the last token/statement
     self.curChar = '' # Curernt character in the string
     self.curPos = -1 # Current position in the string
@@ -24,7 +24,7 @@ class Lexer:
       return self.source[self.curPos+1]
 
   # Invalid token found, print error message and exit
-  def abort(self, message):
+  def abort(self, message: str):
     sys.exit("Lexing error. " + message)
 
   # Skip whitespace except newlines, which we will use to indicate the end of a statement
@@ -105,7 +105,7 @@ class Lexer:
       startPos = self.curPos
       while self.peek().isdigit():
         self.nextChar()
-      if self.peek() == '.': #Decimal
+      if self.peek() == '.': # Decimal
         self.nextChar()
 
         # Must have at least one digit after decimal
@@ -173,6 +173,8 @@ class TokenType(enum.Enum):
   WHILE = 109
   REPEAT = 110
   ENDWHILE = 111
+  ELSEIF = 112
+  ELSE = 113
   # Operators.
   EQ = 201  
   PLUS = 202
