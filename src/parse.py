@@ -21,7 +21,7 @@ class Parser:
   def checkToken(self, kind: TokenType):
     return kind == self.curToken.kind
 
-  # Return true if the current token matches
+  # Return true if the next token matches
   def checkPeek(self, kind: TokenType):
     return kind == self.peekToken.kind
 
@@ -90,6 +90,40 @@ class Parser:
       self.match(TokenType.THEN)
       self.nl()
       self.emitter.emitLine("){")
+
+      # Zero or more statements in the body
+      while not self.checkToken(TokenType.ENDIF):
+        self.statement()
+
+      self.match(TokenType.ENDIF)
+
+      if (self.peekToken.kind != TokenType.ELSEIF and self.peekToken.kind != TokenType.ELSE):
+        self.emitter.emitLine("}")
+
+    elif self.checkToken(TokenType.ELSEIF):
+      self.nextToken()
+      self.emitter.emit("}else if(")
+      self.comparison()
+
+      self.match(TokenType.THEN)
+      self.nl()
+      self.emitter.emitLine("){")
+
+      # Zero or more statements in the body
+      while not self.checkToken(TokenType.ENDIF):
+        self.statement()
+
+      self.match(TokenType.ENDIF)
+
+      if (self.peekToken.kind != TokenType.ELSEIF and self.peekToken.kind != TokenType.ELSE):
+        self.emitter.emitLine("}")
+
+    elif self.checkToken(TokenType.ELSE):
+      self.nextToken()
+      self.emitter.emit("}else")
+
+      self.nl()
+      self.emitter.emitLine("{")
 
       # Zero or more statements in the body
       while not self.checkToken(TokenType.ENDIF):

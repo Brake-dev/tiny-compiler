@@ -1,0 +1,11 @@
+LET a = 0
+
+IF a == 0 THEN
+  PRINT "1"
+ENDIF
+ELSEIF a == 1 THEN
+  PRINT "2"
+ENDIF
+ELSE
+  PRINT "3"
+ENDIF
