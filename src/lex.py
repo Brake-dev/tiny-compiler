@@ -142,26 +142,13 @@ class Lexer:
     self.nextChar()
     return token
 
-class Token:
-  def __init__(self, tokenText, tokenKind):
-    self.text = tokenText
-    self.kind = tokenKind
-
-  @staticmethod
-  def checkIfKeyword(tokenText):
-    for kind in TokenType:
-      # Relies on all keyword enum values being 1XX
-      if kind.name == tokenText and kind.value >= 100 and kind.value < 200:
-        return kind
-    return None
-
 class TokenType(enum.Enum):
   EOF = -1
   NEWLINE = 0
   NUMBER = 1
   IDENT = 2
   STRING = 3
-  # Keywords.
+  # Keywords
   LABEL = 101
   GOTO = 102
   PRINT = 103
@@ -175,7 +162,7 @@ class TokenType(enum.Enum):
   ENDWHILE = 111
   ELSEIF = 112
   ELSE = 113
-  # Operators.
+  # Operators
   EQ = 201  
   PLUS = 202
   MINUS = 203
@@ -187,3 +174,16 @@ class TokenType(enum.Enum):
   LTEQ = 209
   GT = 210
   GTEQ = 211
+
+class Token:
+  def __init__(self, tokenText: str, tokenKind: TokenType):
+    self.text = tokenText
+    self.kind = tokenKind
+
+  @staticmethod
+  def checkIfKeyword(tokenText):
+    for kind in TokenType:
+      # Relies on all keyword enum values being 1XX
+      if kind.name == tokenText and kind.value >= 100 and kind.value < 200:
+        return kind
+    return None

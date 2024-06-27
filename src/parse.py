@@ -1,5 +1,5 @@
 import sys
-from lex import TokenType, Lexer
+from lex import TokenType, Token, Lexer
 from emit import Emitter
 
 # Parser object keeps track of current token and checks if the code matches the grammar
@@ -12,8 +12,8 @@ class Parser:
     self.labelsDeclared = set() # Labels declared so far
     self.labelsGotoed = set() # Labels goto'ed so far
 
-    self.curToken = None
-    self.peekToken = None
+    self.curToken: Token = None
+    self.peekToken: Token = None
     self.nextToken()
     self.nextToken() #  Call this twice to initialize current and peek
 
@@ -64,6 +64,27 @@ class Parser:
       if label not in self.labelsDeclared:
         self.abort("Attempting to GOTO to undeclared label: " + label)
 
+  def ifElseStatement(self):
+    if self.checkToken(TokenType.ELSEIF):
+      self.nextToken()
+      self.emitter.emit("}else if(")
+      self.comparison()
+
+      self.match(TokenType.THEN)
+      self.nl()
+      self.emitter.emitLine("){")
+
+      # Zero or more statements in the body
+      while not self.checkToken(TokenType.ENDIF):
+        self.statement()
+
+      self.match(TokenType.ENDIF)
+
+      if (self.peekToken.kind != TokenType.ELSEIF and self.peekToken.kind != TokenType.ELSE):
+        self.emitter.emitLine("}")
+
+    return self.peekToken.kind == TokenType.ELSEIF
+
   # One of the following statements ...
   def statement(self):
     # Check the first token to see what kind of statement this is
@@ -99,38 +120,25 @@ class Parser:
 
       if (self.peekToken.kind != TokenType.ELSEIF and self.peekToken.kind != TokenType.ELSE):
         self.emitter.emitLine("}")
+      else:
+        self.nextToken()
+        while(self.ifElseStatement()):
+          self.nextToken()
 
-    elif self.checkToken(TokenType.ELSEIF):
-      self.nextToken()
-      self.emitter.emit("}else if(")
-      self.comparison()
+        self.nextToken()
+        if self.checkToken(TokenType.ELSE):
+          self.nextToken()
+          self.emitter.emit("}else")
 
-      self.match(TokenType.THEN)
-      self.nl()
-      self.emitter.emitLine("){")
+          self.nl()
+          self.emitter.emitLine("{")
 
-      # Zero or more statements in the body
-      while not self.checkToken(TokenType.ENDIF):
-        self.statement()
+          # Zero or more statements in the body
+          while not self.checkToken(TokenType.ENDIF):
+            self.statement()
 
-      self.match(TokenType.ENDIF)
-
-      if (self.peekToken.kind != TokenType.ELSEIF and self.peekToken.kind != TokenType.ELSE):
-        self.emitter.emitLine("}")
-
-    elif self.checkToken(TokenType.ELSE):
-      self.nextToken()
-      self.emitter.emit("}else")
-
-      self.nl()
-      self.emitter.emitLine("{")
-
-      # Zero or more statements in the body
-      while not self.checkToken(TokenType.ENDIF):
-        self.statement()
-
-      self.match(TokenType.ENDIF)
-      self.emitter.emitLine("}")
+          self.match(TokenType.ENDIF)
+          self.emitter.emitLine("}")
 
     elif self.checkToken(TokenType.WHILE):
       self.nextToken()
@@ -200,7 +208,7 @@ class Parser:
       self.emitter.emitLine("}")
       self.match(TokenType.IDENT)
 
-    # This is not a vlid statement. Error.
+    # This is not a valid statement. Error.
     else:
       self.abort("Invalid statement at " + self.curToken.text + " (" + self.curToken.kind.name + ")")
     

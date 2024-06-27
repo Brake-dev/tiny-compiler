@@ -6,8 +6,12 @@ if(a==0){
 printf("1\n");
 }else if(a==1){
 printf("2\n");
-}else{
 printf("3\n");
+}else if(a==2){
+printf("4\n");
+printf("5\n");
+}else{
+printf("6\n");
 }
 return 0;
 }

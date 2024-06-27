@@ -1,2 +1,3 @@
 - python3 src/teenytiny.py src/average.tiny
 - gcc out.c
+- ./a.out
