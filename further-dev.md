@@ -1,7 +1,7 @@
+- LET a = "string" etc.
 - Abstract syntax tree (AST) representation
 - Parentheses for expressions
 - Logical operators (and, or, not)
-- ELSE IF and ELSE
 - FOR loop
 - Number literals written in binary, hex, and octal
 - Better compiler errors (e.g., what line the error occurred)
@@ -14,6 +14,7 @@
   - https://en.wikipedia.org/wiki/Abstract_syntax_tree
 - More primitive types (e.g., integer, strings, boolean)
 - Arrays
+- Objects
 - Record types (i.e., structs or tuples)
 - Type checking (see type systems)
   - https://en.wikipedia.org/wiki/Type_system

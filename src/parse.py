@@ -175,11 +175,25 @@ class Parser:
       self.emitter.emitLine("goto " + self.curToken.text + ";")
       self.match(TokenType.IDENT)
 
-    # "LET" ident "=" expression
-    elif self.checkToken(TokenType.LET):
+    # "INT" ident "=" expression
+    elif self.checkToken(TokenType.INT):
       self.nextToken()
 
-      # Check if ident exists in symbol table. If not, declare it.
+      if self.curToken.text not in self.symbols:
+        self.symbols.add(self.curToken.text)
+        self.emitter.headerLine("int " + self.curToken.text + ";")
+
+      self.emitter.emit(self.curToken.text + " = ")
+      self.match(TokenType.IDENT)
+      self.match(TokenType.EQ)
+
+      self.expression()
+      self.emitter.emitLine(";")
+
+    # "FLT" ident "=" expression
+    elif self.checkToken(TokenType.FLT):
+      self.nextToken()
+
       if self.curToken.text not in self.symbols:
         self.symbols.add(self.curToken.text)
         self.emitter.headerLine("float " + self.curToken.text + ";")
@@ -189,6 +203,22 @@ class Parser:
       self.match(TokenType.EQ)
 
       self.expression()
+      self.emitter.emitLine(";")
+
+    # "STR" ident "=" value
+    elif self.checkToken(TokenType.STR):
+      self.nextToken()
+
+      if self.curToken.text not in self.symbols:
+        self.symbols.add(self.curToken.text)
+        self.emitter.headerLine("char " + self.curToken.text + ";")
+
+      self.emitter.emit(self.curToken.text + " = ")
+      self.match(TokenType.IDENT)
+      self.match(TokenType.EQ)
+      self.emitter.emit("\"" + self.curToken.text + "\"")
+      self.match(TokenType.STRING)
+
       self.emitter.emitLine(";")
 
     # "INPUT" ident
@@ -207,6 +237,36 @@ class Parser:
       self.emitter.emitLine("*s\");")
       self.emitter.emitLine("}")
       self.match(TokenType.IDENT)
+
+    elif self.checkToken(TokenType.ARRAYSTART):
+      if self.curToken.text not in self.symbols:
+        self.symbols.add(self.curToken.text)
+        self.emitter.headerLine("char " + self.curToken.text + ";")
+
+      arrayContent = str()
+      arrayLength = 0
+
+      if self.peekToken == TokenType.NUMBER:
+        self.emitter.emit("float ")
+      elif self.peekToken == TokenType.STRING:
+        self.emitter.emit("char ")
+
+      while self.curToken != TokenType.ARRAYEND:
+        if self.curToken == TokenType.NUMBER or self.curToken == TokenType.STRING:
+          arrayContent += self.curToken.text
+          arrayLength += 1
+        else:
+          self.abort("Illegal character in an array " + self.curToken.text + ". Only numbers and strings are allowed.")
+
+        if self.peekToken != TokenType.ARRAYEND:
+          arrayContent += ", "
+
+        self.nextToken()
+
+      self.emitter.emit("[" + str(arrayLength) + "]")
+
+      if arrayContent > 0:
+        self.emitter.emit(" = {" + arrayContent + "};")
 
     # This is not a valid statement. Error.
     else:

@@ -131,6 +131,10 @@ class Lexer:
         token = Token(toknText, TokenType.IDENT)
       else: # Keyword
         token = Token(toknText, keyword)
+    elif self.curChar == '[':
+      token = Token(self.curChar, TokenType.ARRAYSTART)
+    elif self.curChar == ']':
+      token = Token(self.curChar, TokenType.ARRAYEND)
     elif self.curChar == '\n':
       token = Token(self.curChar, TokenType.NEWLINE)
     elif self.curChar == '\0':
@@ -148,12 +152,13 @@ class TokenType(enum.Enum):
   NUMBER = 1
   IDENT = 2
   STRING = 3
+  ARRAYSTART = 4
+  ARRAYEND = 5
   # Keywords
   LABEL = 101
   GOTO = 102
   PRINT = 103
   INPUT = 104
-  LET = 105
   IF = 106
   THEN = 107
   ENDIF = 108
@@ -162,6 +167,12 @@ class TokenType(enum.Enum):
   ENDWHILE = 111
   ELSEIF = 112
   ELSE = 113
+  INT = 114
+  FLT = 115
+  STR = 116
+  INT_ARRAY = 117
+  FLT_ARRAY = 118
+  STR_ARRAY = 119
   # Operators
   EQ = 201  
   PLUS = 202

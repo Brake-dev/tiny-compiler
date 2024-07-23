@@ -1,0 +1,5 @@
+INT a = 1
+FLT b = 1.1
+STR c = "stuff"
+STR[] d = []
+STR[] e = ["1", "2", "3"]
